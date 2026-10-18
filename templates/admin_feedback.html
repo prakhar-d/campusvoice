@@ -1,0 +1,10 @@
+{% extends "base.html" %}{% from "_macros.html" import admincard %}{% block title %}All feedback · {{ SITE_NAME }}{% endblock %}
+{% block body %}
+<div class="head row-between">
+  <div><h1>All feedback</h1><p class="muted">Full details: who wrote it, about whom, the scores and the comment.</p></div>
+  <input class="search" data-filter=".fbwrap .fb" placeholder="Search by name…">
+</div>
+<div class="fbwrap">
+  {% for r in rows %}{{ admincard(r) }}{% else %}<div class="empty"><div class="big">🗂️</div><h3>No feedback here yet</h3></div>{% endfor %}
+</div>
+{% endblock %}

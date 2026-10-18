@@ -1,0 +1,61 @@
+{% extends "base.html" %}{% block title %}Students · {{ SITE_NAME }}{% endblock %}
+{% block body %}
+<div class="head"><h1>Students</h1><p class="muted">Manage the class list and student accounts.</p></div>
+
+<div class="card">
+  <div class="row-between">
+    <h2>Class list ({{ roster|selectattr('uid')|list|length }} of {{ roster|length }} registered)</h2>
+    <input class="search" data-filter="#roster tr" placeholder="Search name…">
+  </div>
+  <div class="tablewrap">
+    <table id="roster">
+      <tr><th>Name</th><th>Account</th><th></th></tr>
+      {% for s in roster %}
+      <tr data-name="{{ s.name|lower }}">
+        <td>
+          <form method="post" action="{{ url_for('rename_roster', i=s.id) }}" class="row" style="margin:0">
+            <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+            <input name="name" value="{{ s.name }}" required style="min-width:160px">
+            <button class="btn ghost sm">Rename</button>
+          </form>
+        </td>
+        <td>
+          {% if s.uid %}
+            <span class="chip">Registered</span> <small class="muted">{{ s.email }}</small>
+          {% else %}
+            <small class="muted">Not registered yet</small>
+          {% endif %}
+        </td>
+        <td class="act">
+          {% if s.uid %}
+          <form method="post" action="{{ url_for('delete', kind='account', i=s.uid) }}" class="confirm" data-msg="Remove this account? The student can register again, and their course feedback is deleted.">
+            <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+            <button class="btn ghost sm">Remove account</button>
+          </form>
+          {% endif %}
+          <form method="post" action="{{ url_for('delete', kind='roster', i=s.id) }}" class="confirm" data-msg="Delete this name from the class list and all feedback about them?">
+            <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+            <button class="btn danger sm">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}<tr><td colspan="3">No students yet. Paste your class list below.</td></tr>{% endfor %}
+    </table>
+  </div>
+  
+  <details class="bulk" style="margin-top: 20px;">
+    <summary class="link">Paste many names at once</summary>
+    <form method="post" action="{{ url_for('bulk_roster') }}" style="margin-top: 10px;">
+      <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+      <textarea name="names" rows="6" placeholder="One student name per line" required></textarea>
+      <button class="btn" style="margin-top: 10px;">Add all names</button>
+    </form>
+  </details>
+  
+  <form method="post" action="{{ url_for('add_roster') }}" class="row" style="margin-top: 20px;">
+    <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+    <input name="name" placeholder="Add a student name" required>
+    <button class="btn">+ Add student</button>
+  </form>
+</div>
+{% endblock %}

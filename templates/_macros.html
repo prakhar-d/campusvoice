@@ -1,0 +1,21 @@
+{% macro bars(groups, avgs) %}{% for g, items in groups %}<h3 class="gh">{{ g }}</h3>
+{% for k, t in items %}<div class="brow"><span>{{ t }}</span><div class="meter"><i style="width:{{ ((avgs.get(k, 0)) / 5 * 100)|round }}%"></i></div><b>{{ avgs.get(k, '–') }}</b></div>{% endfor %}{% endfor %}{% endmacro %}
+
+{% macro admincard(r) %}
+<div class="card fb {{ 'hid' if r.hidden }}" data-name="{{ (r.giver ~ ' ' ~ r.target)|lower }}">
+  <div class="who2">
+    <div><span class="rolechip">{{ r.giver_role|capitalize }}</span> <b>{{ r.giver }}</b> <small>{{ r.giver_email }}</small></div>
+    <span class="arrow">→</span>
+    <div><span class="rolechip alt">Student</span> <b>{{ r.target }}</b></div>
+  </div>
+  <div class="row-between" style="margin:10px 0"><span class="muted">{{ r.created_at[:16] }}</span>
+  <div class="chips"><span class="chip avg">★ {{ r.avg }} / 5</span>{% if r.hidden %}<span class="chip warn">Hidden</span>{% endif %}</div></div>
+  <p class="cm">{{ r.comment or 'No comment written.' }}</p>
+  <details class="sc"><summary class="link">Question-wise scores</summary>
+  <table>{% for k, v in (r.scores|fromjson).items() %}<tr><td>{{ QTEXT[k] }}</td><td class="stars">{{ '★' * v }}<span class="off">{{ '★' * (5 - v) }}</span></td></tr>{% endfor %}</table></details>
+  <div class="act" style="margin-top:12px">
+    <form method="post" action="{{ url_for('hide', i=r.id) }}"><input type="hidden" name="_csrf" value="{{ csrf_token() }}"><button class="btn ghost sm">{{ 'Unhide' if r.hidden else 'Hide from receiver' }}</button></form>
+    <form method="post" action="{{ url_for('delete', kind='review', i=r.id) }}" class="confirm" data-msg="Delete this feedback permanently? The giver will be able to submit again."><input type="hidden" name="_csrf" value="{{ csrf_token() }}"><button class="btn danger sm">Delete</button></form>
+  </div>
+</div>
+{% endmacro %}

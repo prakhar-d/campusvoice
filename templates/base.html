@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}{{ SITE_NAME }}{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head><body class="{% block bodyclass %}{% endblock %}">
+{% block content %}
+<nav class="nav"><div class="wrap nav-in">
+  <a class="brand" href="{{ url_for('home') }}">
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo-img">
+    <span class="brand-text">{{ SITE_NAME }}</span>
+  </a>
+  {% set r = session.role %}{% set ep = request.endpoint %}
+  <div class="links">
+  {% if r == 'admin' %}
+    <a class="{{ 'on' if ep == 'admin' }}" href="{{ url_for('admin') }}">Dashboard</a>
+    <a class="{{ 'on' if ep == 'adminfb' }}" href="{{ url_for('adminfb') }}">All feedback</a>
+    <a class="{{ 'on' if ep == 'people' }}" href="{{ url_for('people') }}">Students</a>
+  {% elif r %}
+    <a class="{{ 'on' if ep == 'dash' }}" href="{{ url_for('dash') }}">Home</a>
+    <a class="{{ 'on' if ep in ('corner','give') }}" href="{{ url_for('corner', kind='student') }}">Student Feedback</a>
+    <a class="{{ 'on' if ep == 'inbox' }}" href="{{ url_for('inbox') }}">Feedback for me</a>
+  {% endif %}
+  </div>
+  {% if r %}
+  <div class="nav-r"><span class="who">{{ session.name }} <em>{{ session.role }}</em></span>
+  <form method="post" action="{{ url_for('logout') }}"><input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+  <button class="btn ghost sm">Sign out</button></form></div>
+  {% endif %}
+  </div></nav>
+<main class="wrap">
+{% if session.uid and request.endpoint not in ('login', 'register', 'setup', 'forgot_password', 'reset_password') %}
+  {% for cat, msg in get_flashed_messages(with_categories=true) %}<div class="flash {{ cat }}">{{ msg }}</div>{% endfor %}
+{% endif %}
+{% block body %}{% endblock %}</main>
+{% endblock %}
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body></html>

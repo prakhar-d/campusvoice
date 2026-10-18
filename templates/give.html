@@ -1,0 +1,56 @@
+{% extends "base.html" %}{% block title %}Feedback for {{ target.name }} · {{ SITE_NAME }}{% endblock %}
+{% block body %}
+<a class="link" href="{{ url_for('corner', kind=kind) }}">← Back to Student Feedback</a>
+{% set total = namespace(n=0) %}{% for g, items in groups %}{% set total.n = total.n + items|length %}{% endfor %}
+
+<div class="banner slim card" style="display:flex; align-items:center; gap:16px; margin-top:16px;">
+  <div class="avatar big" style="width:64px; height:64px; font-size:1.6rem;">{{ target.name[:1]|upper }}</div>
+  <div>
+    <span class="rolechip alt">{{ kind|capitalize }} feedback</span>
+    <h1 style="margin:4px 0 0;">{{ target.name }}</h1>
+  </div>
+</div>
+
+<div class="tip">
+  {% if named %}
+    👤 This feedback will be shown to the student with <b>your name</b>.
+  {% else %}
+    🔒 <b>Anonymous.</b> The student will see only "A classmate". Only the administrator can see your name.
+  {% endif %}
+  You can submit once, and it cannot be edited afterwards.
+</div>
+
+<form method="post" data-qs="{{ total.n }}">
+  <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+  
+  <div class="sticky">
+    <span>Answered <b class="answered">0</b> of {{ total.n }}</span>
+    <div class="progress"><i class="fillbar"></i></div>
+  </div>
+
+  {% for grp, items in groups %}
+  <div class="card">
+    <h2>{{ grp }}</h2>
+    {% for k, text in items %}
+    <div class="q">
+      <p>{{ text }}</p>
+      <div class="scale">
+        {% for i in [1,2,3,4,5] %}
+          <input type="radio" id="{{ k }}{{ i }}" name="{{ k }}" value="{{ i }}" required>
+          <label for="{{ k }}{{ i }}">{{ i }}</label>
+        {% endfor %}
+        <span class="ends"><small>Poor</small><small>Excellent</small></span>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endfor %}
+
+  <div class="card">
+    <h2>Comment</h2>
+    <label>Short comment <small>(optional, <span class="cnt">0</span>/300)</small></label>
+    <textarea name="comment" maxlength="300" rows="3" placeholder="One or two respectful, helpful sentences…"></textarea>
+    <button class="btn block confirm-submit">Submit feedback</button>
+  </div>
+</form>
+{% endblock %}

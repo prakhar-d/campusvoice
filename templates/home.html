@@ -1,0 +1,40 @@
+{% extends "base.html" %}{% block title %}Home · {{ SITE_NAME }}{% endblock %}
+{% block body %}
+<div class="hero-container">
+  <div class="hero-text">
+    <h1>Hello, {{ session.name.split()[0] }} <span class="wave">👋</span></h1>
+    <p>Welcome to the 360° feedback platform. Share your honest thoughts to help your peers grow.</p>
+  </div>
+
+  <div class="mega-card-wrapper">
+    <a class="mega-card" href="{{ url_for('corner', kind='student') }}">
+      <div class="glow"></div>
+      <div class="mega-icon">🧑‍🎓</div>
+      <h2>Student Feedback</h2>
+      <p>Share feedback on a student's studies and behaviour to help them improve.</p>
+      
+      <div class="progress-section">
+        <div class="progress-text">
+          <span>Progress</span>
+          <b>{{ s[0] }} / {{ s[1] }} given</b>
+        </div>
+        <div class="progress-bar">
+          <i style="width:{{ (s[0] / s[1] * 100)|round if s[1] else 0 }}%"></i>
+        </div>
+      </div>
+      <span class="mega-cta">Open Student Feedback →</span>
+    </a>
+  </div>
+
+  <a class="inbox-card" href="{{ url_for('inbox') }}">
+    <div class="inbox-left">
+      <div class="inbox-icon">💬</div>
+      <div>
+        <h3>Feedback for me</h3>
+        <p>See what your peers have said about you.</p>
+      </div>
+    </div>
+    <span class="chip">{{ got }} received</span>
+  </a>
+</div>
+{% endblock %}

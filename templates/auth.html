@@ -1,0 +1,11 @@
+{% extends "base.html" %}{% block bodyclass %}auth{% endblock %}
+{% block content %}
+<div class="auth-container">
+  <div style="text-align: center; margin-bottom: 30px;">
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" style="width: 80px; margin-bottom: 10px;">
+    <h2 style="font-size: 1.6rem; color: var(--primary);">{{ SITE_NAME }}</h2>
+  </div>
+  {% for cat, msg in get_flashed_messages(with_categories=true) %}<div class="flash {{ cat }}">{{ msg }}</div>{% endfor %}
+  {% block form %}{% endblock %}
+</div>
+{% endblock %}

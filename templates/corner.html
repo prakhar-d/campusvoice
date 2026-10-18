@@ -1,0 +1,32 @@
+{% extends "base.html" %}{% block title %}Student Feedback · {{ SITE_NAME }}{% endblock %}
+{% block body %}
+<div class="head row-between">
+  <div>
+    <h1>Student Feedback</h1>
+    <p class="muted">Give feedback on a student's studies and behaviour. Be honest and respectful.</p>
+  </div>
+  <input class="search" data-filter=".people .pcard" placeholder="Search by name…">
+</div>
+<div class="people">
+{% for p in people %}
+  <div class="pcard" data-name="{{ p.name|lower }}">
+    <div class="avatar">{{ p.name[:1]|upper }}</div>
+    <div class="pn">
+      <b>{{ p.name }}</b>
+      <small>Student</small>
+    </div>
+    {% if p.done %}
+      <span class="chip">✓ Submitted</span>
+    {% else %}
+      <a class="btn sm" href="{{ url_for('give', kind=kind, tid=p.id) }}">Give feedback</a>
+    {% endif %}
+  </div>
+{% else %}
+  <div class="empty" style="grid-column:1/-1">
+    <div class="big">🧑‍🎓</div>
+    <h3>No one here yet</h3>
+    <p class="muted">No students are available yet.</p>
+  </div>
+{% endfor %}
+</div>
+{% endblock %}

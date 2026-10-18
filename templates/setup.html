@@ -1,0 +1,9 @@
+{% extends "auth.html" %}{% block title %}Setup · {{ SITE_NAME }}{% endblock %}
+{% block form %}
+<h2>Create admin account</h2><p class="muted">One time setup. Choose a strong password.</p>
+<form method="post"><input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+<label>Admin name</label><input name="name" required autofocus>
+<label>Admin email</label><input type="email" name="email" required>
+<label>Password <small>(at least 8 characters)</small></label><input type="password" name="password" minlength="8" required>
+<button class="btn block">Create admin</button></form>
+{% endblock %}

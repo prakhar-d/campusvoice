@@ -1,0 +1,38 @@
+{% extends "base.html" %}{% from "_macros.html" import bars %}{% block title %}Feedback for me · {{ SITE_NAME }}{% endblock %}
+{% block body %}
+<div class="head">
+  <h1>Feedback for me</h1>
+  <p class="muted">Feedback from teachers shows their name. Feedback from classmates is anonymous.</p>
+</div>
+
+{% if rows %}
+  <div class="stats">
+    <div class="card stat"><span>Feedback received</span><b>{{ rows|length }}</b></div>
+    <div class="card stat"><span>Overall average</span><b>{{ overall }}<small>/5</small></b></div>
+  </div>
+  
+  <div class="card">
+    <h2>Your scores by question</h2>
+    {{ bars(groups, avgs) }}
+  </div>
+  
+  <div class="sec" style="margin: 30px 0 16px;"><h2>Comments</h2></div>
+  {% for r in rows if r.comment %}
+    <div class="card">
+      <div class="row-between">
+        <b>{{ r.label }}</b>
+        <span class="chip">★ {{ r.avg }}</span>
+      </div>
+      <p class="cmt">{{ r.comment }}</p>
+    </div>
+  {% else %}
+    <div class="card"><p class="muted">No written comments yet.</p></div>
+  {% endfor %}
+{% else %}
+  <div class="empty">
+    <div class="big">💬</div>
+    <h3>No feedback yet</h3>
+    <p class="muted">When someone gives you feedback, it will appear here.</p>
+  </div>
+{% endif %}
+{% endblock %}

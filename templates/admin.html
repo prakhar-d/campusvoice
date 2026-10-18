@@ -1,0 +1,45 @@
+{% extends "base.html" %}{% block title %}Admin · {{ SITE_NAME }}{% endblock %}
+{% block body %}
+<div class="head row-between"><div><h1>Admin dashboard</h1><p class="muted">Overview of all student feedback.</p></div>
+<div class="row" style="margin:0"><a class="btn ghost" href="{{ url_for('export') }}">⬇ Export CSV</a><a class="btn" href="{{ url_for('adminfb') }}">View all feedback →</a></div></div>
+
+<div class="stats">
+  <div class="card stat"><span>Students registered</span><b>{{ totals.students }}</b></div>
+  <div class="card stat"><span>Feedback given</span><b>{{ totals.total }}</b></div>
+  <div class="card stat"><span>Average rating</span><b>{{ totals.avg or '–' }}<small>/5</small></b></div>
+</div>
+
+<div class="card">
+  <h2>Student Feedback Overview</h2>
+  <div class="tablewrap">
+    <table>
+      <tr><th>Student</th><th>Responses</th><th>Average</th></tr>
+      {% for s in ssum %}
+      <tr>
+        <td><b>{{ s.name }}</b></td>
+        <td>{{ s.n }}</td>
+        <td><div class="bar"><i style="width:{{ ((s.avg or 0) / 5 * 100)|round }}%"></i></div> {{ s.avg }}</td>
+      </tr>
+      {% else %}<tr><td colspan="3">No feedback yet.</td></tr>{% endfor %}
+    </table>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Recent activity</h2>
+  <div class="tablewrap">
+    <table>
+      <tr><th>Given by</th><th></th><th>About</th><th>Rating</th><th>When</th></tr>
+      {% for r in recent %}
+      <tr>
+        <td><b>{{ r.giver }}</b> <span class="rolechip">{{ r.giver_role|capitalize }}</span></td>
+        <td>→</td>
+        <td><b>{{ r.target }}</b> <span class="rolechip alt">Student</span></td>
+        <td class="stars">★ {{ r.avg }}</td>
+        <td><small>{{ r.created_at[:16] }}</small></td>
+      </tr>
+      {% else %}<tr><td colspan="5">No feedback has been given yet.</td></tr>{% endfor %}
+    </table>
+  </div>
+</div>
+{% endblock %}
