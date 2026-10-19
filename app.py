@@ -1,32 +1,39 @@
-import os, csv, io, json, secrets, time, smtplib
+import os, csv, io, json, secrets, time
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from functools import wraps
 from flask import (Flask, render_template, request, redirect, url_for,
                    session, flash, g, Response, abort)
 from werkzeug.security import generate_password_hash, check_password_hash
-import resend  # <--- NEW: Import Resend
+
+# --- SENDGRID IMPORTS ---
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 
 # Use the Database URL from Render Environment Variables
 DB_URL = os.environ.get("DATABASE_URL")
 
-# --- EMAIL CONFIGURATION FOR OTP (Using Resend API) ---
+# --- EMAIL CONFIGURATION (SENDGRID) ---
 def send_otp_email(to_email, otp):
-    resend.api_key = os.environ.get("RESEND_API_KEY")
+    api_key = os.environ.get("SENDGRID_API_KEY")
     
-    # If you haven't set the API key, print to console (Test Mode)
-    if not resend.api_key:
+    # If API key is missing, print to console (Test Mode)
+    if not api_key:
         print(f"\n{'='*40}\n[TEST MODE] OTP for {to_email}: {otp}\n{'='*40}\n")
         return
+        
+    message = Mail(
+        from_email='prakhardusad15@gmail.com', # Must match the verified email in SendGrid
+        to_emails=to_email,
+        subject='Password Reset - CampusVoice',
+        plain_text_content=f'Your password reset OTP is: {otp}\n\nThis code expires in 10 minutes.'
+    )
+    
     try:
-        resend.Emails.send({
-            "from": "onboarding@resend.dev", # Resend's default testing email
-            "to": to_email,
-            "subject": "Password Reset - CampusVoice",
-            "text": f"Your password reset OTP is: {otp}\n\nThis code expires in 10 minutes."
-        })
+        sg = SendGridAPIClient(api_key)
+        sg.send(message)
         print(f"Successfully sent OTP to {to_email}")
     except Exception as e:
         print("Failed to send email:", e)
@@ -234,7 +241,7 @@ def forgot_password():
         if cur.fetchone():
             otp = str(secrets.randbelow(900000) + 100000)
             expiry = time.time() + 600
-            # FIXED: PostgreSQL syntax for upsert
+            # PostgreSQL syntax for upsert
             cur.execute("""INSERT INTO password_resets(email, otp, expiry) VALUES(%s,%s,%s) 
                            ON CONFLICT (email) DO UPDATE SET otp=EXCLUDED.otp, expiry=EXCLUDED.expiry""",
                          (email, otp, expiry))
