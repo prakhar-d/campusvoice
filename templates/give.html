@@ -34,13 +34,19 @@
     {% for k, text in items %}
     <div class="q">
       <p>{{ text }}</p>
+      
+      <!-- UPDATED: Rating scale with text labels -->
       <div class="scale">
+        {% set words = ['Poor', 'Fair', 'Good', 'Very Good', 'Excellent'] %}
         {% for i in [1,2,3,4,5] %}
-          <input type="radio" id="{{ k }}{{ i }}" name="{{ k }}" value="{{ i }}" required>
-          <label for="{{ k }}{{ i }}">{{ i }}</label>
+          <div class="scale-option">
+            <input type="radio" id="{{ k }}{{ i }}" name="{{ k }}" value="{{ i }}" required>
+            <label for="{{ k }}{{ i }}">{{ i }}</label>
+            <span class="scale-text">{{ words[i-1] }}</span>
+          </div>
         {% endfor %}
-        <span class="ends"><small>Poor</small><small>Excellent</small></span>
       </div>
+      
     </div>
     {% endfor %}
   </div>

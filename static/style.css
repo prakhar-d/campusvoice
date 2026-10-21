@@ -125,12 +125,70 @@ tr:last-child td { border-bottom: none; }
 .auth-container p.muted { text-align: center; margin-bottom: 24px; }
 .auth-links { display: flex; justify-content: space-between; margin-top: 20px; font-size: 0.9rem; }
 
-/* Form Elements for Radio/Scale */
-.scale { display: flex; gap: 10px; }
-.scale input { position: absolute; opacity: 0; width: 1px; height: 1px; }
-.scale label { width: 50px; height: 50px; margin: 0; border-radius: 12px; border: 1px solid var(--border); display: grid; place-items: center; font-weight: 700; cursor: pointer; background: var(--bg); color: var(--text-main); font-size: 1.1rem; transition: 0.2s; }
-.scale label:hover { border-color: var(--primary); background: rgba(6, 182, 212, 0.05); }
-.scale input:checked + label { background: var(--primary); border-color: var(--primary); color: #fff; box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3); }
+/* --- UPDATED Rating Scale --- */
+.scale { 
+  display: flex; 
+  gap: 16px; 
+  flex-wrap: wrap; 
+  margin-bottom: 10px;
+}
+
+.scale-option { 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  gap: 8px;
+}
+
+.scale input { 
+  position: absolute; 
+  opacity: 0; 
+  width: 1px; 
+  height: 1px; 
+}
+
+.scale label { 
+  width: 50px; 
+  height: 50px; 
+  margin: 0; 
+  border-radius: 12px; 
+  border: 1px solid var(--border); 
+  display: grid; 
+  place-items: center; 
+  font-weight: 700; 
+  cursor: pointer; 
+  background: var(--bg); 
+  color: var(--text-main); 
+  font-size: 1.1rem; 
+  transition: 0.2s; 
+}
+
+.scale label:hover { 
+  border-color: var(--primary); 
+  background: rgba(6, 182, 212, 0.05); 
+}
+
+.scale input:checked + label { 
+  background: var(--primary); 
+  border-color: var(--primary); 
+  color: #fff; 
+  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3); 
+}
+
+/* Text below the numbers */
+.scale-text {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  text-align: center;
+  transition: 0.2s;
+}
+
+/* Highlight text when selected */
+.scale-option input:checked ~ .scale-text {
+  color: var(--primary);
+  font-weight: 700;
+}
 
 /* Misc / Details tags */
 details summary { list-style: none; }
@@ -152,7 +210,6 @@ details summary.link:hover { text-decoration: underline; }
 .q { padding: 20px 0; border-bottom: 1px solid var(--border); }
 .q:last-child { border-bottom: none; }
 .q p { margin: 0 0 16px; font-weight: 600; font-size: 1.05rem; color: var(--text-main); }
-.ends { display: flex; justify-content: space-between; width: 100%; margin-top: 8px; color: var(--text-muted); font-size: 0.85rem; }
 .brow { display: grid; grid-template-columns: 1fr 120px 40px; gap: 16px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
 .brow:last-child { border-bottom: none; }
 .meter { height: 8px; background: var(--border); border-radius: 99px; overflow: hidden; }
