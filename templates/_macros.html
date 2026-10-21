@@ -8,7 +8,8 @@
     <span class="arrow">→</span>
     <div><span class="rolechip alt">Student</span> <b>{{ r.target }}</b></div>
   </div>
-  <div class="row-between" style="margin:10px 0"><span class="muted">{{ r.created_at[:16] }}</span>
+  <!-- FIXED DATE FORMATTING HERE -->
+  <div class="row-between" style="margin:10px 0"><span class="muted">{{ r.created_at.strftime('%Y-%m-%d %H:%M') if r.created_at else '' }}</span>
   <div class="chips"><span class="chip avg">★ {{ r.avg }} / 5</span>{% if r.hidden %}<span class="chip warn">Hidden</span>{% endif %}</div></div>
   <p class="cm">{{ r.comment or 'No comment written.' }}</p>
   <details class="sc"><summary class="link">Question-wise scores</summary>

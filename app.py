@@ -11,26 +11,20 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
 BASE = os.path.dirname(os.path.abspath(__file__))
-
-# Use the Database URL from Render Environment Variables
 DB_URL = os.environ.get("DATABASE_URL")
 
 # --- EMAIL CONFIGURATION (SENDGRID) ---
 def send_otp_email(to_email, otp):
     api_key = os.environ.get("SENDGRID_API_KEY")
-    
-    # If API key is missing, print to console (Test Mode)
     if not api_key:
         print(f"\n{'='*40}\n[TEST MODE] OTP for {to_email}: {otp}\n{'='*40}\n")
         return
-        
     message = Mail(
         from_email='prakhardusad15@gmail.com', # Must match the verified email in SendGrid
         to_emails=to_email,
         subject='Password Reset - CampusVoice',
         plain_text_content=f'Your password reset OTP is: {otp}\n\nThis code expires in 10 minutes.'
     )
-    
     try:
         sg = SendGridAPIClient(api_key)
         sg.send(message)
@@ -56,7 +50,6 @@ app.config.update(SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE="Lax",
 # ---------- database ----------
 def db():
     if "db" not in g:
-        # Connect to PostgreSQL
         g.db = psycopg2.connect(DB_URL, cursor_factory=RealDictCursor)
     return g.db
 
@@ -70,7 +63,6 @@ def init_db():
     if not DB_URL:
         print("WARNING: DATABASE_URL is not set. Database will not work.")
         return
-    
     c = db()
     cur = c.cursor()
     cur.execute("""
@@ -92,7 +84,6 @@ def init_db():
     CREATE TABLE IF NOT EXISTS password_resets(
         email TEXT PRIMARY KEY, otp TEXT, expiry REAL);
     """)
-    
     rp = os.path.join(BASE, "roster.txt")
     if os.path.exists(rp):
         cur.execute("SELECT 1 FROM roster LIMIT 1")
@@ -101,7 +92,6 @@ def init_db():
                 for n in f:
                     if n.strip():
                         cur.execute("INSERT INTO roster(name) VALUES(%s)", (n.strip(),))
-    
     em, pw = os.environ.get("ADMIN_EMAIL"), os.environ.get("ADMIN_PASSWORD")
     if em and pw:
         cur.execute("SELECT 1 FROM users WHERE role='admin'")
@@ -241,7 +231,6 @@ def forgot_password():
         if cur.fetchone():
             otp = str(secrets.randbelow(900000) + 100000)
             expiry = time.time() + 600
-            # PostgreSQL syntax for upsert
             cur.execute("""INSERT INTO password_resets(email, otp, expiry) VALUES(%s,%s,%s) 
                            ON CONFLICT (email) DO UPDATE SET otp=EXCLUDED.otp, expiry=EXCLUDED.expiry""",
                          (email, otp, expiry))

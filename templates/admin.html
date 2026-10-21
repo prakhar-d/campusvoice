@@ -36,7 +36,8 @@
         <td>→</td>
         <td><b>{{ r.target }}</b> <span class="rolechip alt">Student</span></td>
         <td class="stars">★ {{ r.avg }}</td>
-        <td><small>{{ r.created_at[:16] }}</small></td>
+        <!-- FIXED DATE FORMATTING HERE -->
+        <td><small>{{ r.created_at.strftime('%Y-%m-%d %H:%M') if r.created_at else '' }}</small></td>
       </tr>
       {% else %}<tr><td colspan="5">No feedback has been given yet.</td></tr>{% endfor %}
     </table>
