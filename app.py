@@ -177,15 +177,22 @@ def setup():
 @app.route("/register", methods=["GET", "POST"])
 def register():
     c = db(); cur = c.cursor()
-    cur.execute("SELECT id,name FROM roster WHERE user_id IS NULL ORDER BY name")
-    free = cur.fetchall()
+    # Fetch ALL students, including those who have registered
+    cur.execute("SELECT id, name, user_id FROM roster ORDER BY name")
+    all_students = cur.fetchall()
+
     if request.method == "POST":
-        e, p = request.form["email"].strip().lower(), request.form["password"]
+        e = request.form.get("email", "").strip().lower()
+        p = request.form.get("password", "")
         rid = request.form.get("roster_id", type=int) or 0
-        cur.execute("SELECT * FROM roster WHERE id=%s AND user_id IS NULL", (rid,))
+        
+        cur.execute("SELECT * FROM roster WHERE id=%s", (rid,))
         row = cur.fetchone()
+        
         if not row or "@" not in e or len(p) < 8:
-            flash("Choose your name, enter a valid email and a password of 8+ characters.", "error")
+            flash("Choose a valid name, enter a valid email and a password of 8+ characters.", "error")
+        elif row["user_id"] is not None:
+            flash("This student is already registered. Please sign in instead.", "error")
         else:
             cur.execute("SELECT 1 FROM users WHERE email=%s", (e,))
             if cur.fetchone():
@@ -197,9 +204,13 @@ def register():
                 cur.execute("UPDATE roster SET user_id=%s WHERE id=%s", (uid, rid))
                 c.commit()
                 flash("Account created. You can sign in now.", "ok")
+                cur.close()
                 return redirect(url_for("login"))
     cur.close()
-    return render_template("register.html", free=free)
+    
+    # Convert to JSON string for the frontend JS to use
+    students_json = json.dumps([dict(s) for s in all_students])
+    return render_template("register.html", students_json=students_json)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():

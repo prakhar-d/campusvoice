@@ -1,14 +1,35 @@
 {% extends "auth.html" %}{% block title %}Register · {{ SITE_NAME }}{% endblock %}
 {% block form %}
-<h2>Create your account</h2><p class="muted">Students: pick your name from the class list.</p>
-{% if not free %}<div class="tip">No names are available. Ask the administrator to add the class list.</div>{% endif %}
-<form method="post"><input type="hidden" name="_csrf" value="{{ csrf_token() }}">
-<label>Your name</label>
-<select name="roster_id" required><option value="">Select your name</option>{% for s in free %}<option value="{{ s.id }}">{{ s.name }}</option>{% endfor %}</select>
-<label>Email</label><input type="email" name="email" required>
-<label>Password <small>(at least 8 characters)</small></label><input type="password" name="password" minlength="8" required>
-<button class="btn block">Create account</button></form>
+<h2>Create your account</h2><p class="muted">Students: type your name to search the class list.</p>
+
+<form method="post" id="register-form">
+    <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+    
+    <label>Your Name</label>
+    <div class="autocomplete-container">
+        <!-- The visible text input -->
+        <input type="text" id="student-search" placeholder="Start typing your name..." autocomplete="off" required>
+        <!-- The hidden input that actually submits the ID to Flask -->
+        <input type="hidden" name="roster_id" id="student-id" required>
+        <!-- The dropdown list -->
+        <ul id="suggestions-list" class="suggestions"></ul>
+    </div>
+
+    <label>Email</label>
+    <input type="email" name="email" required>
+    
+    <label>Password <small>(at least 8 characters)</small></label>
+    <input type="password" name="password" minlength="8" required>
+    
+    <button class="btn block" id="submit-btn">Create account</button>
+</form>
+
 <div class="auth-links" style="justify-content: center;">
   <span class="muted">Already registered? <a href="{{ url_for('login') }}">Sign in</a></span>
 </div>
+
+<!-- Pass the Python data to JavaScript -->
+<script>
+    const allStudents = {{ students_json | safe }};
+</script>
 {% endblock %}
